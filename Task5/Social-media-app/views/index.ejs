@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Social Media App</title>
+    <link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+    <h1>Social Media Platform</h1>
+    <form action="/posts" method="POST" enctype="multipart/form-data">
+        <textarea name="content" placeholder="What's on your mind?" required></textarea>
+        <input type="file" name="image" />
+        <button type="submit">Post</button>
+    </form>
+    <div id="posts">
+        <% posts.forEach(post => { %>
+            <div class="post">
+                <p><%= post.content %></p>
+                <% if(post.image) { %>
+                    <img src="<%= post.image %>" alt="Post Image" />
+                <% } %>
+                <p>Likes: <%= post.likes %></p>
+                <form action="/like/<%= post._id %>" method="POST">
+                    <button type="submit">Like</button>
+                </form>
+            </div>
+        <% }) %>
+    </div>
+    <script src="/socket.io/socket.io.js"></script>
+    <script>
+        const socket = io();
+        socket.on('newPost', function(post) {
+            const postsDiv = document.getElementById('posts');
+            const newPostDiv = document.createElement('div');
+            newPostDiv.classList.add('post');
+            newPostDiv.innerHTML = `<p>${post.content}</p>${post.image ? `<img src="${post.image}" alt="Post Image" />` : ''}<p>Likes: ${post.likes}</p>`;
+            postsDiv.prepend(newPostDiv);
+        });
+    </script>
+</body>
+</html>
